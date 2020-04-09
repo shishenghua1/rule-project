@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.gateway.mapper.CwmRuleGatewayMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.gateway.model.CwmRuleGateway" >
+        <result column="ID" property="id" jdbcType="VARCHAR" />
+        <result column="GROUP_NAME" property="gatewayName" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      ID,GATEWAY_NAME,CREATE_TIME,STATUS
+    </sql>
+
+    <select id="getGateway" resultMap="BaseResultMap">
+        SELECT id,group_name,create_time,status
+        FROM cwm_rule_groups
+        WHERE group_type = 'assembling'
+            AND (create_user_id = 'admin' or create_user_id is null)
+            AND deleted = '0'
+            AND module_id=#{moduleId,jdbcType=VARCHAR}
+            AND (draft_flag = '1'
+                OR draft_flag IS NULL)
+        ORDER BY CREATE_TIME
+    </select>
+
+    <select id="getRuleNum" resultType="int">
+       SELECT COUNT(id)
+        FROM cwm_rule_groups
+        WHERE  (create_user_id = 'admin' or create_user_id is null)
+            AND group_type = 'ruleGroup'
+            AND deleted = '0'
+            AND module_id = #{moduleId,jdbcType=VARCHAR}
+            AND (draft_flag = '1'
+                OR draft_flag IS NULL)
+    </select>
+
+    <select id="getGateWayRuleNum" resultType="int">
+       SELECT COUNT(crgr.id)
+        FROM cwm_rule_group_rel crgr
+        WHERE crgr.parent_node_id = (
+            SELECT rule_id_rel
+            FROM cwm_rule_group_rel
+            WHERE parent_node_id = #{groupId,jdbcType=VARCHAR}
+        )
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.boco.eoms.ruleproject.fujian.gateway.model.CwmRuleGateway" >
+        update cwm_rule_groups
+        set status = #{status,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getGatewayById" resultType="string" parameterType="string">
+        select GROUP_DESCRIPTION from cwm_rule_groups where id =  #{ruleId,jdbcType=VARCHAR}
+    </select>
+</mapper>

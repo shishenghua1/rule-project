@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>统计页面</title>
+    <link rel="stylesheet" href="../../css/common/bootstrap.min.css"></link> 
+    <link rel="stylesheet" href="../../css/common/bootstrap-table.css"></link>
+    <link rel="stylesheet" href="../../css/common/layui.css"></link>
+
+   <!-- <link rel="stylesheet" type="text/css" href="../../css/massage.css"></link>-->
+
+    <link rel="stylesheet" type="text/css" href="../../css/statistics.css"></link>
+    <link rel="stylesheet" type="text/css" href="../../css/sother.css"></link>
+</head>
+<body>
+    <div id="statistics">
+        <div id="taskList" class="clearfix">
+            <p id="allTasks" class="e-c-frist mrb-1">
+                <strong class="num general">202</strong>
+                <span class="title">总任务数</span>
+            </p>
+            <p id="AiFinishNum" class="e-c-other mrb-1">
+                <strong class="num completed">365</strong>
+                <span class="title">已完成AI质检任务数</span>
+            </p>
+            <p id="AiFinishRate" class="e-c-other mrb-1">
+                <strong class="num speed">58%</strong>
+                <span class="title">AI质检完成百分比</span>
+            </p>
+            <p id="coverageRate" class="e-c-other mrb-1">
+                <strong class="num coverage">100%</strong>
+                <span class="title">质检监测规则的使用覆盖率</span>
+            </p>
+            <p id="workOrderNum" class="e-c-other mrb-1">
+                <strong class="num gdNum">505</strong>
+                <span class="title">进入人工复检的故障工单数量</span>
+            </p>
+            <p id="averageTime" class="e-c-other">
+                <strong class="num consuming">2s-3s</strong>
+                <span class="title">质检规则监测平均性能耗时</span>
+            </p>
+        </div>
+
+        <div id="echartsTableCon" class="clearfix">
+            <div class="e-g-left">
+                <div id="pieCon">
+                    <p class="e-c-title">质检通过率</p>
+                    <div class="body">
+                        <span class="pieText">
+                               AI质检通过比率=故障工单进入质检后通过的比率
+                        </span>
+                        <div id="pie">
+                        </div>
+                    </div>
+
+                </div>
+                <div id="lineCon">
+                    <p class="e-c-title">匹配度折线图</p>
+                    <div class="body">
+                        <div id="line">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="e-g-right">
+                <div id="tableCon">
+                    <p class="e-c-title">质检工单列表</p>
+                    <div class="body">
+                            <div class="layui-form-item">
+                                <label class="layui-form-label">AI质检是否通过</label>
+                                <div class="layui-input-block chooseCon clearfix">
+                                    <p class="checkedCon">
+                                        <input type="checkbox"/>
+                                        <label class="all selected" data-id="all" onClick="selectInput(this)"></label>
+                                        <span>全部</span>
+                                    </p>
+                                    <p class="checkedCon">
+                                        <input type="checkbox"/>
+                                        <label class="inputChecked" data-id="yes" onClick="selectInput(this)"></label>
+                                        <span>是</span>
+                                    </p>
+                                    <p class="checkedCon">
+                                        <input type="checkbox"/>
+                                        <label class="inputChecked" data-id="no" onClick="selectInput(this)"></label>
+                                        <span>否</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <table id="table"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="../../js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../../js/echarts.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery-ui.js"></script>
+    <script src="../../js/public/bootstrap.min.js"></script>
+    <script src="../../js/public/bootstrap-table.js"></script>
+    <script src="../../js/sother.js"></script>
+    <script src="../../js/public/layui.all.js"></script>
+    <script src="../../js/statistics.js"></script>
+    
+</body>
+</html>

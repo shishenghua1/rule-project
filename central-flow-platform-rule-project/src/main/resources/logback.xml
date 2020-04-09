@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+scan:当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true
+scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
+debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+-->
+<!--<configuration  scan="true" scanPeriod="60 seconds" debug="false">-->
+<configuration>
+	<contextName>central-flow-platform-rule-project</contextName>
+	<property name="contextName" value="central-flow-platform-rule-project"></property><!--我就要用变量 add by szy -->
+	<property name="log.path" value="${LOG_PATH:-.}" />
+	<!--输出到控制台-->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+             <level>ERROR</level>
+         </filter>-->
+		<!--
+        %d{HH: mm:ss.SSS}——日志输出时间
+        %thread——输出日志的进程名字，这在Web应用以及异步任务处理中很有用
+        %-5level——日志级别，并且使用5个字符靠左对齐
+        %logger{36}——日志输出者的名字
+        %msg——日志消息
+        %n——平台的换行符
+        -->
+		<encoder class="com.boco.eoms.ruleproject.base.logback.LogBackExEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%contextName- %black(%d{yyyy-MM-dd HH:mm:ss.SSS}) [%boldYellow(%T)] %highlight(%-5level) %boldGreen(%logger{56}.%method:%L)  - %cyan(%msg%n)</pattern>
+		</encoder>
+	</appender>
+
+	<!--输出到文件-->
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--<file>logs/logback.%d{yyyy-MM-dd_HH:mm:ss}.log</file>-->
+		<!--<file>logs/logback.log</file>这个按文件大小切割时候必须要要-->
+		<!--按天输出日志-->
+		<!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+		<!--按大小我失败了，但是我研究出了中级方法，SizeAndTime，这个屌爆了，唯一缺点就是这个不能做文件数量限制，其他都挺好-->
+		<file>${log.path}/${contextName}_out.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!--<fileNamePattern>${log.path}/logback.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+			<fileNamePattern>logs/${contextName}_out.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<maxFileSize>100MB</maxFileSize>
+			<totalSizeCap>5GB</totalSizeCap>
+		</rollingPolicy>
+		<!--按大小输出日志-->
+		<!--下面这段注释，按大小输出，按10kb切割，我尝试了很久，已经失败了，谁愿意谁来试吧=。=-->
+		<!--<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">-->
+		<!--&lt;!&ndash;<fileNamePattern>logs/logback.%d{yyyy-MM-dd_HH:mm:ss}.log.zip</fileNamePattern>&ndash;&gt;-->
+		<!--<FileNamePattern>logs/logback.%d{yyyy-MM-dd}-%i.log</FileNamePattern>-->
+		<!--<minIndex>1</minIndex>-->
+		<!--<maxIndex>2</maxIndex>-->
+		<!--</rollingPolicy>-->
+		<!--<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">-->
+		<!--<maxFileSize>10KB</maxFileSize>-->
+		<!--</triggeringPolicy>-->
+		<encoder class="com.boco.eoms.ruleproject.base.logback.LogBackExEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%contextName- %d{yyyy-MM-dd HH:mm:ss.SSS} [%T] %-5level %logger{56}.%method:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<!--输出Error日志到文件-->
+	<appender name="fileErrorLog" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--如果只是想要 Error 级别的日志，那么需要过滤一下，默认是 info 级别的，ThresholdFilter-->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>Error</level>
+		</filter>
+		<!--日志名称，如果没有File 属性，那么只会使用FileNamePattern的文件路径规则
+            如果同时有<File>和<FileNamePattern>，那么当天日志是<File>，明天会自动把今天
+            的日志改名为今天的日期。即，<File> 的日志都是当天的。
+
+        <File>${logback.logdir}/error.${logback.appname}.log</File>
+         -->
+		<File>logs/${contextName}_err.log</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!--<fileNamePattern>${log.path}/logback.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+			<fileNamePattern>logs/${contextName}_err.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+			<maxFileSize>50MB</maxFileSize>
+			<totalSizeCap>3GB</totalSizeCap>
+		</rollingPolicy>
+
+		<!--滚动策略，按照时间滚动 TimeBasedRollingPolicy
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+		<!--文件路径,定义了日志的切分方式——把每一天的日志归档到一个文件中,以防止日志填满整个磁盘空间
+        <FileNamePattern>logs/error.logback.%d{yyyy-MM-dd}.log</FileNamePattern>-->
+		<!--只保留最近90天的日志
+        <maxHistory>90</maxHistory>-->
+		<!--用来指定日志文件的上限大小，那么到了这个值，就会删除旧的日志-->
+		<!--<totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>-->
+		<!--日志输出编码格式化-->
+		<encoder class="com.boco.eoms.ruleproject.base.logback.LogBackExEncoder">
+			<charset>UTF-8</charset>
+			<pattern>%contextName- %d{yyyy-MM-dd HH:mm:ss.SSS} [%T] %-5level %logger{56}.%method:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<!--
+    root节点是必选节点，用来指定最基础的日志输出级别，只有一个level属性。
+    level:用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，不能设置为INHERITED或者同义词NULL。
+    默认是DEBUG。
+    -->
+	<root level="info">
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+	</root>
+
+	<!--
+    <logger>用来设置某一个包或者具体的某一个类的日志打印级别、以及指定<appender>。
+    <logger>仅有一个name属性，一个可选的level和一个可选的addtivity属性
+    name:用来指定受此logger约束的某一个包或者具体的某一个类。
+    level:用来设置打印级别，大小写无关：TRACE, DEBUG, INFO, WARN, ERROR, ALL 和 OFF，还有一个特俗值INHERITED或者同义词NULL，代表强制执行上级的级别。如果未设置此属性，那么当前logger将会继承上级的级别。
+    addtivity:是否向上级logger传递打印信息。默认是true。
+    -->
+	<!--<logger name="com.dudu.controller"/>-->
+	<!--logback.LogbackDemo：类的全路径 -->
+	<!--<logger name="com.dudu.controller.LearnController" level="WARN" additivity="false">-->
+	<!--<appender-ref ref="console"/>-->
+	<!--</logger>-->
+
+	<!-- 测试环境+开发环境. 多个使用逗号隔开. -->
+	<!--<springProfile name="test,dev">-->
+	<!--<logger name="com.dudu.controller" level="info" />-->
+	<!--</springProfile>-->
+	<!-- 生产环境. -->
+	<!--<springProfile name="prod">-->
+	<!--<logger name="com.dudu.controller" level="ERROR" />-->
+	<!--</springProfile>-->
+</configuration>

@@ -1,0 +1,142 @@
+*{
+    margin: 0;
+    padding: 0;
+    list-style:none;
+}
+.clearfix:after{
+    content:"";
+    display:block;
+    clear:both;
+    zoom: 1;
+}
+#details{
+    background:#efefef;
+    padding:40px 100px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left:0;
+    right:0;
+    overflow:auto;
+}
+.header{
+    height:35px;
+    line-height:35px;
+    font-size:16px;
+    color:#fff;
+    padding:0 20px;
+    background:#80b0f9;
+}
+#formCon,#myTableCon{
+    background: #fff;
+    box-shadow: 1px 3px 3px #80b0f92e;
+    border-radius: 4px;
+}
+#formList,#myTable{
+    padding:20px;
+}
+
+.eoms-ul>li>div>p.title{
+    width: 130px;
+    background-color: #e7f1ff;
+    box-sizing: border-box;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: auto;
+    padding:8px;
+    color: #517bba;
+    position: relative;
+    transition: .5s;
+    border:none!important;
+    display:table-cell!important;
+    vertical-align: middle;
+    line-height:25px!important;
+}
+.eoms-ul>li>div>p.content{
+    display:table-cell!important;
+    padding-left: 10px;
+    vertical-align: middle;
+    line-height:25px!important;
+}
+.eoms-ul>li>div>p.title:after{
+    display:none!important;
+}
+.eoms-ul>li>div>p.title .triangle {
+    position: absolute;
+    top: 50%;
+    transform:translateY(-50%);
+    left: 100%;
+    width: 0;
+    height: 0;
+    border-top:6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left:6px solid #e7f1ff;
+}
+.eoms-ul>li>div>p.ieTitle .triangle {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 0;
+    height: 0;
+    border-top:6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left:6px solid #e7f1ff;
+}
+.eoms-ul>li {
+    border: 1px solid #efefef;
+}
+.eoms-ul .content>img{
+    margin-right:5px;
+}
+div[lay-id="tableList"]{
+    margin:0;
+}
+#resultCon{
+    float:right;
+    font-size:13px;
+    color:#666;
+    margin-top:10px;
+}
+#result{
+    color:#19d13b;
+}
+#myTable div[lay-id="tableList"]{
+    border:none;
+    border-top:2px solid #ccc;
+    border-bottom:2px solid #ccc;
+}
+#myTable .layui-border-box *{
+    font-size:12px;
+    color:#666;
+}
+#myTable .layui-table-header * {
+    font-size: 15px;
+    color: #666;
+}
+#myTable td{
+    padding:0;
+    line-height:30px;
+    border:none;
+}
+#myTable td em{
+    font-style:normal;
+}
+#myTable .layui-table-cell{
+    height:30px;
+    padding:4px 0;
+}
+#myTable .layui-table-body{
+    margin-bottom:0;
+}
+#myTable .layui-table-body tr:hover{
+    background:#e4edf9;
+}
+.newOpenTr{
+    background:#e4edf9!important;
+}
+.parentsTr{
+    border-bottom:1px solid #bbbbbb;
+}
+.parentsTr td[data-field="groupDescription"] span{
+    text-decoration: underline;
+}

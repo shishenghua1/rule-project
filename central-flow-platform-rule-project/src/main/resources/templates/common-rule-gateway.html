@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>规则配置页面</title>
+    <link rel="stylesheet" href="../../css/common/bootstrap.min.css"></link> 
+    <link rel="stylesheet" href="../../css/common/bootstrap-table.css"></link> 
+
+    <link rel="stylesheet" type="text/css" href="../../css/massage.css"></link> 
+</head>
+
+<body>
+  <div class="e-g-hide">
+    <!-- 列表显示 -->
+    <div id="cart" class="clearfix">
+	    <div class="e-float ui-widget" id="allRule" onclick="fstTable(this)">
+	      <img src="images/jinrurengongfujian.png" alt="" />
+	      <span class="ui-header e-frist"></span>
+	      <span class="lg-20"></span>
+	      <span class="e-number"></span>
+	    </div>
+	    <div class="e-float ui-widget" id="limitRule" onclick="swgTable(this)">
+	      <img src="images/xianzhihuidan.png" alt="" />
+	      <span class="ui-header"></span>
+	      <span class="lg-20"></span>
+	      <span class="e-number"></span>
+	    </div>
+	    <div class="e-float ui-widget" id="inRule" onclick="swgTable(this)">
+	      <img src="images/jinrurengongzhijian.png" alt="" />
+	      <span class="ui-header"></span>
+	      <span class="lg-20"></span>
+	      <span class="e-number"></span>  
+	    </div>
+	    <div class="e-float ui-widget" id="qulityRule" onclick="swgTable(this)">
+	      <img src="images/zhijianhoubohui.png" alt="" />
+	      <span class="ui-header"></span>
+	      <span class="lg-20"></span>
+	      <span class="e-number"></span>
+	    </div>
+	    <div class="e-float ui-widget" id="checkRule" onclick="swgTable(this)">
+	      <img src="images/jinrurengongfujian.png" alt="" />
+	      <span class="ui-header"></span>
+	      <span class="lg-20"></span>
+	      <span class="e-number"></span>
+	    </div>
+    </div>
+    <!-- 表格内容显示 -->
+    <div class="e-g-resources">
+        <div class="e-g-resources-head">
+            全部规则网关
+        </div>
+        <div class="e-form clearfix">
+            <div class="e-form-left">
+                <input type="text" placeholder="搜索" />
+                <img src="../../images/sousuo-shenlan.png" alt="搜索" />
+            </div>
+            <div class="e-form-right">
+				<label><input type="radio" name="checkbox1" value="全部" />全部</label>
+				<label><input type="radio" name="checkbox1" value="未选"/>未选</label>
+		    </div>
+        </div>
+        <!-- 表格显示 -->
+        <div class="e-g-resources-contract">
+            <div class="table-box">
+                <div class="list" data-toggle="table">
+                    <table id="table" class="table">
+                    </table>
+                </div>
+                <!-- 页面跳转 -->
+                <div class="turnPAge">
+                    <span>跳转到</span>
+                    <div>
+                        <input type="text" />
+                        <span>GO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="e-add">
+       <img src="../../images/add3.png" alt="" />
+       <ul class="e-add-list">
+           <li class="e-limitRule" onclick="addTable(this)">质检后驳回规则网关</li>
+           <li class="e-inRule" onclick="addTable(this)">限制回单规则网关</li>
+           <li class="e-qulityRule" onclick="addTable(this)">进入人工规则质检网关</li>
+           <li class="e-checkRule" onclick="addTable(this)">进入人工复检规则网关</li>
+       </ul>
+    </div>
+    
+    <div class="e-m-background"></div>
+    <div class="e-g-tips">
+       <p class="e-g-title">友情提示</p>
+       <div class="e-g-tips-false clearfix">
+          <div class="e-g-false-left">
+              <img src="../../images/gantanhao_hong.png" />
+          </div>
+          <div class="e-g-false-right">
+              <p>是否将勾选的对象添加到</p>
+          </div>
+       </div>
+       <div class="e-btn">
+	       <button class="e-g-cancel">取消</button>
+	       <button class="e-g-sure">确定</button>
+       </div>
+     </div>
+  </div>
+
+    <script type="text/javascript" src="../../js/jquery-1.9.1.min.js"></script>
+    <script src="../../js/public/bootstrap.min.js"></script>
+    <script src="../../js/public/bootstrap-table.js"></script>
+    <!-- <script src="js/public/bootstrap-table-export.js"></script> -->
+    <script type="text/javascript" src="../../js/tablecommon.js"></script>
+</body>
+</html>

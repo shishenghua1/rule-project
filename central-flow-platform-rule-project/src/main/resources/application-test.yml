@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@10.91.0.101:1521:helowin
+    username: P_EOMS_CENTRAL_WORKFLOW
+    password: P_EOMS_CENTRAL_WORKFLOW
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+
+#日志输出位置
+logging:
+  path: /opt/central-flow-platform/logs/
+
+#规则加载的服务端地址信息
+ruleReloadInfo:
+  ip: 10.91.0.122
+  port: 8095
+  version: v1
+
+#请求接口地址
+interfaceInfo:
+  cityUrl: http://localhost:8006/api/v1/simulation/service/getCitys
+  simulationDataUrl: http://localhost:8006/api/v1/simulation/service/getSimulationData
+  dictUrl: http://localhost:8006/api/v1/simulation/service/getDicts
+
+#接口调用参数值定义
+interfaceParam:
+  parentAreaId: 101
+  parentDictId: 1010104

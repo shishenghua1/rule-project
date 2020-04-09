@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.rulegateway.mapper.CwmRuleGroupGatewayRelMapper">
+
+  <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.rulegateway.model.CwmRuleGroupGatewayRel" >
+    <result column="ID" property="id" jdbcType="VARCHAR" />
+    <result column="GROUP_ID" property="groupId" jdbcType="VARCHAR" />
+    <result column="GROUP_NAME" property="groupName" jdbcType="VARCHAR" />
+    <result column="GATEWAY_ID" property="gatewayId" jdbcType="VARCHAR" />
+    <result column="GATEWAY_NAME" property="gatewayName" jdbcType="VARCHAR" />
+    <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    <result column="RULE_ORDER" property="ruleOrder" jdbcType="VARCHAR" />
+    <result column="GROUP_DESCRIPTION" property="groupDescription" jdbcType="VARCHAR" />
+    <result column="GROUP_REMARK" property="groupRemark" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    ID,GROUP_ID,GROUP_NAME,GATEWAY_ID,GATEWAY_NAME,
+    CREATE_TIME,STATUS,RULE_ORDER,GROUP_DESCRIPTION,GROUP_REMARK
+  </sql>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from cwm_rule_group_rel where ID = #{id,jdbcType=VARCHAR}
+  </delete>
+
+  <update id="updateByPrimaryKey" parameterType="com.boco.eoms.ruleproject.fujian.rulegateway.model.CwmRuleGroupGatewayRel" >
+    update cwm_rule_group_rel
+    set status = #{status,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="queryRule" resultMap="BaseResultMap">
+    select groups.*
+    from  (select crg.id as GROUP_ID,
+    crg.group_name,
+    crg.create_time,
+    crg.group_description,
+    crgo.group_output_params_result as GROUP_REMARK
+    from cwm_rule_groups crg,
+    cwm_rule_group_output crgo
+    where crg.id = crgo.group_id and crgo.group_output_result = 'false'
+    and crg.module_id=#{moduleId,jdbcType=VARCHAR}
+    <if test="ruleName != null and ruleName !=''" >
+      and crg.group_name like '%'||#{ruleName,jdbcType=VARCHAR}||'%'
+    </if>
+    and (crg.create_user_id = 'admin' or crg.create_user_id is null)
+    AND crg.group_type = 'ruleGroup'
+    AND crg.deleted = '0'
+    AND (crg.draft_flag = '1'
+    OR crg.draft_flag IS NULL)
+    order by crg.create_time desc) groups
+    <if test="isRelevance != null and isRelevance !='' and isRelevance=='true'" >
+      where groups.group_id not in (
+      select rule_id_rel
+      FROM cwm_rule_group_rel
+      WHERE parent_node_id in (
+      SELECT rule_id_rel
+      FROM cwm_rule_group_rel crgr
+      WHERE parent_node_id  in (SELECT id
+      FROM cwm_rule_groups
+      WHERE  (create_user_id = 'admin' or create_user_id is null)
+      AND group_type = 'assembling'
+      AND deleted = '0'
+      AND module_id = #{moduleId,jdbcType=VARCHAR}
+      AND (draft_flag = '1'
+      OR draft_flag IS NULL))
+      )
+      )
+    </if>
+  </select>
+
+  <select id="getGatewayByGroupId"  resultMap="BaseResultMap">
+        SELECT id as GATEWAY_ID,group_name as GATEWAY_NAME
+        FROM cwm_rule_groups
+        WHERE id in (
+            SELECT PARENT_NODE_ID
+            FROM CWM_RULE_GROUP_REL
+            WHERE RULE_ID_REL in (
+                SELECT PARENT_NODE_ID
+                FROM CWM_RULE_GROUP_REL
+                WHERE RULE_ID_REL = #{groupId,jdbcType=VARCHAR}
+            )
+        )  and id in (
+        SELECT id
+        FROM cwm_rule_groups
+        WHERE group_type = 'assembling'
+            AND (create_user_id = 'admin' or create_user_id is null)
+            AND deleted = '0'
+            AND module_id=#{moduleId,jdbcType=VARCHAR}
+            AND (draft_flag = '1'
+                OR draft_flag IS NULL))
+  </select>
+
+  <select id="queryRuleGateWay" resultMap="BaseResultMap">
+      SELECT crgr.id,crgr.RULE_ID_REL as GROUP_ID,crgr.RULE_INFO_REL as GROUP_NAME,
+       crg.id as GATEWAY_ID,crg.GROUP_NAME as  GATEWAY_NAME,
+       crgr.STATUS,crgr.ORDER_BY as RULE_ORDER,crg2.GROUP_DESCRIPTION,
+       crgo.group_output_params_result as GROUP_REMARK,crgr.create_time
+        from cwm_rule_groups crg,cwm_rule_group_rel crgr,cwm_rule_groups crg2,cwm_rule_group_output crgo
+        where crg.id =#{gatewayId,jdbcType=VARCHAR} and crgr.ID in (
+            SELECT id
+            FROM cwm_rule_group_rel
+            WHERE parent_node_id = (
+                SELECT rule_id_rel
+                FROM cwm_rule_group_rel
+                WHERE parent_node_id =#{gatewayId,jdbcType=VARCHAR}
+            )
+        )
+          <if test="ruleName != null and ruleName !=''" >
+              and crgr.RULE_INFO_REL like '%'||#{ruleName,jdbcType=VARCHAR}||'%'
+          </if>
+        and crg2.ID = crgr.RULE_ID_REL and crg2.id = crgo.group_id and crgo.group_output_result = 'false'
+  </select>
+
+  <select id="getRelatedNum" resultType="int">
+    select count(crgr.id) from cwm_rule_group_rel crgr
+    where crgr.rule_id_rel in
+    <foreach collection="cwmRuleGroupGatewayRelList" index="index" item="item" open="(" separator="," close=")">
+      #{item.groupId}
+    </foreach>
+      and (select PARENT_NODE_ID from  cwm_rule_group_rel
+      where rule_id_rel = crgr.PARENT_NODE_ID) in ( SELECT id
+      FROM cwm_rule_groups
+      WHERE group_type = 'assembling'
+      AND (create_user_id = 'admin' or create_user_id is null)
+      AND deleted = '0'
+      AND module_id=#{moduleId,jdbcType=VARCHAR}
+      AND (draft_flag = '1'
+      OR draft_flag IS NULL))
+  </select>
+
+  <select id="getMaxRuleOrder" resultType="String" parameterType="java.lang.String">
+       SELECT max(ORDER_BY)
+            FROM cwm_rule_group_rel
+            WHERE parent_node_id = (
+                SELECT rule_id_rel
+                FROM cwm_rule_group_rel
+                WHERE parent_node_id =#{gatewayId,jdbcType=VARCHAR}
+            )
+  </select>
+
+    <select id="getConditionId" resultType="string" parameterType="java.lang.String">
+        select crgr.rule_id_rel  from cwm_rule_group_rel crgr
+        where crgr.PARENT_NODE_ID =#{gatewayId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getRuleIdById" resultType="string" parameterType="java.lang.String">
+        select rule_id_rel  from cwm_rule_group_rel
+        where id =#{id,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insertRule" parameterType="com.boco.eoms.ruleproject.fujian.rulegateway.model.CwmRuleGroupRel">
+        insert into cwm_rule_group_rel (id, parent_node_id, node_type,order_by, create_time, rule_id_rel, rule_info_rel
+          )
+        values (#{id,jdbcType=VARCHAR}, #{parentNodeId,jdbcType=VARCHAR}, #{nodeType,jdbcType=VARCHAR},
+          #{orderBy,jdbcType=DECIMAL}, sysdate, #{ruleIdRel,jdbcType=VARCHAR}, #{ruleInfoRel,jdbcType=VARCHAR}
+          )
+    </insert>
+
+  <insert id="batchInsert" parameterType="java.util.List">
+    insert into cwm_rule_group_rel (id,parent_node_id,node_type,order_by,create_time,rule_id_rel,rule_info_rel,status)
+    <foreach  collection="list" item="item"   separator=" union all ">
+      select
+      sys_guid(),
+      #{item.gatewayId,jdbcType=VARCHAR},
+      'ruleGroup',
+      #{item.ruleOrder,jdbcType=VARCHAR},
+      sysdate,
+      #{item.groupId,jdbcType=VARCHAR},
+      #{item.groupName,jdbcType=VARCHAR},
+      'enable' from dual
+    </foreach>
+  </insert>
+
+  <update id="batchUpdate" parameterType="java.util.List">
+      update cwm_rule_group_rel
+      <trim prefix="set" suffixOverrides=",">
+        <trim prefix="order_by =case" suffix="end,">
+          <foreach collection="list" item="item">
+            <if test="item.ruleOrder!=null">
+              when id=#{item.id} then #{item.ruleOrder}
+            </if>
+          </foreach>
+        </trim>
+      </trim>
+      <where>
+        <foreach collection="list" separator="or" item="item">
+          id=#{item.id}
+        </foreach>
+      </where>
+  </update>
+
+  <update id="batchUpdateRule" parameterType="java.util.List">
+    update cwm_rule_groups
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="create_time =case" suffix="end,">
+        <foreach collection="list" item="item">
+          <if test="item.createTime!=null">
+            when id=#{item.ruleId} then #{item.createTime}
+          </if>
+        </foreach>
+      </trim>
+    </trim>
+    <where>
+      <foreach collection="list" separator="or" item="item">
+        id=#{item.ruleId}
+      </foreach>
+    </where>
+  </update>
+
+</mapper>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>仿真记录页面</title>
+   <!-- <link rel="stylesheet" href="../../css/common/bootstrap.min.css"></link>
+    <link rel="stylesheet" href="../../css/common/bootstrap-table.css"></link>-->
+    <link rel="stylesheet" href="../../css/common/layui.css"></link>
+
+   <!-- <link rel="stylesheet" type="text/css" href="../../css/massage.css"></link>-->
+
+    <link rel="stylesheet" type="text/css" href="../../css/records.css"></link>
+
+</head>
+<body>
+    <div id="records">
+        <div class="header">
+            仿真情况记录
+        </div>
+        <div id="tableCon" class="clearfix">
+            <div id="searchFun">
+                <label for=""><i class="timeIcon"></i> <input type="text" readOnly="readOnly" id="dateTime"/></label>
+                <button onClick="cancel()" style="display:none">取消</button>
+                <button onClick="search()">查询</button>
+            </div>
+            <table id="table"></table>
+            <div id="layPage"></div>
+        </div>
+
+
+    </div>
+
+    <script type="text/javascript" src="../../js/jquery-1.12.4.js"></script>
+  <!--  <script type="text/javascript" src="../../js/echarts.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery-ui.js"></script>
+    <script src="../../js/public/bootstrap.min.js"></script>
+    <script src="../../js/public/bootstrap-table.js"></script>-->
+    <script src="../../js/public/layui.all.js"></script>
+    <script src="../../js/records.js"></script>
+</body>
+</html>

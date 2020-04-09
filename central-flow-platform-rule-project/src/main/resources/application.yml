@@ -1,0 +1,58 @@
+server:
+  port: 8006
+  tomcat:
+    min-spare-threads: 50
+    max-threads: 200
+    uri-encoding: UTF-8
+    connection-timeout: 30000
+
+spring:
+  #切换环境
+  profiles:
+    active: dev
+  session:
+    store-type: none
+  http:
+    encoding:
+      force: true
+      charset: UTF-8
+      enabled: true
+  jackson:
+    time-zone: GMT+8
+    default-property-inclusion: non_null
+
+mybatis:
+  mapper-locations: mapping/*.xml
+  type-aliases-package: com.boco.eoms.ruleproject.**.model
+  configuration:
+    database-id: ${database.type}
+    #spring boot打印mybatis的执行sql设置
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    #解决数据库null字段不显示问题
+    #callSettersOnNulls: true
+
+pagehelper:
+  helperDialect: oracle
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  config:
+    classpath:logback.xml
+
+#dragPage拖动类型页面/commonPage普通页面
+pageShow:
+  type: commonPage
+
+#故障工单对应的模块id
+moduleId:
+  fault: 42b56cbceeae4b4281a4f09e9df9fc50
+
+#网关id配置
+gatewayId: 
+  reCheckGatewayId: 2c1168b9799142ffba2453be69b03b54
+
+#规则执行的数量
+ruleRun:
+  num: 100

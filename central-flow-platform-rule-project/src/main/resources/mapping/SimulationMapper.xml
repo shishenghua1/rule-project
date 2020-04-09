@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.simulation.mapper.SimulationMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.simulation.model.Simulation" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="operator" property="operator" jdbcType="VARCHAR" />
+        <result column="operation_time" property="operationTime" jdbcType="TIMESTAMP" />
+        <result column="operation_button" property="operationButton" jdbcType="VARCHAR" />
+        <result column="city" property="city" jdbcType="VARCHAR" />
+        <result column="network_sheet_one" property="networkSheetOne" jdbcType="VARCHAR" />
+        <result column="network_sheet_two" property="networkSheetTwo" jdbcType="VARCHAR" />
+        <result column="sheet_start_time" property="sheetStartTime" jdbcType="TIMESTAMP" />
+        <result column="sheet_end_time" property="sheetEndTime" jdbcType="TIMESTAMP" />
+        <result column="gateway_ids" property="gatewayIds" jdbcType="VARCHAR" />
+        <result column="sheet_total" property="sheetTotal" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      id,operator,operation_time,operation_button,city,network_sheet_one,network_sheet_two,sheet_start_time,
+      sheet_end_time,gateway_ids,sheet_total
+    </sql>
+
+    <insert id="insert" parameterType="com.boco.eoms.ruleproject.fujian.simulation.model.Simulation">
+        insert into cwm_rule_simulation (<include refid="Base_Column_List" />)
+        values (#{id,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR},sysdate,
+        #{operationButton,jdbcType=VARCHAR},#{city,jdbcType=VARCHAR},#{networkSheetOne,jdbcType=VARCHAR},
+        #{networkSheetTwo,jdbcType=VARCHAR},#{sheetStartTime,jdbcType=TIMESTAMP},#{sheetEndTime,jdbcType=TIMESTAMP},
+        #{gatewayIds,jdbcType=VARCHAR},#{sheetTotal,jdbcType=VARCHAR})
+    </insert>
+
+    <select id="selectById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cwm_rule_simulation where id = #{simulationId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="updateSheetTotal">
+        update cwm_rule_simulation
+        set sheet_total = #{sheetTotal,jdbcType=VARCHAR}
+        where id = #{simulationId,jdbcType=VARCHAR}
+    </update>
+
+    <select id="getSimulations" resultMap="BaseResultMap">
+        select id,nvl(operator,'admin') as operator,operation_time from cwm_rule_simulation
+        <if test="startTime != null and endTime != null">
+            where operation_time &gt;= #{startTime} and operation_time &lt;= #{endTime}
+        </if>
+        order by operation_time asc
+    </select>
+</mapper>

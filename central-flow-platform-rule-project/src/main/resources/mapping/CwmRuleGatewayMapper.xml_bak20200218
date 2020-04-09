@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.gateway.mapper.CwmRuleGatewayMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.gateway.model.CwmRuleGateway" >
+        <result column="ID" property="id" jdbcType="VARCHAR" />
+        <result column="GATEWAY_NAME" property="gatewayName" jdbcType="VARCHAR" />
+        <result column="CREATE_TIME" property="createTime" jdbcType="TIMESTAMP" />
+        <result column="STATUS" property="status" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      ID,GATEWAY_NAME,CREATE_TIME,STATUS
+    </sql>
+
+    <select id="getGateway" resultMap="BaseResultMap">
+        select crg.id,
+               crg.gateway_name,
+               crg.status,
+               crg.create_time,
+               count(crggr.gateway_id) as groupNum
+        from cwm_rule_gateway crg
+                 left join cwm_rule_group_gateway_rel crggr
+                           on crg.id = crggr.gateway_id
+        group by crg.id, crg.gateway_name, crg.status,crg.create_time
+        order by crg.create_time
+    </select>
+
+    <select id="getRuleNum" resultType="int">
+        select count(*) from  (select crg.id as GROUP_ID,
+            crg.group_name,
+            crg.create_time,
+            crg.group_description,
+            crgo.group_output_params_result as GROUP_REMARK
+        from cwm_rule_groups crg,
+        CWM_RULE_GROUP_OUTPUT crgo
+        where crg.id = crgo.group_id and crgo.group_output_result = 'false'
+        and crg.module_id=#{moduleId,jdbcType=VARCHAR}
+        order by crg.create_time desc) grops
+        left
+        join cwm_rule_group_gateway_rel crggr on grops.GROUP_ID=crggr.group_id
+    </select>
+
+    <update id="updateByPrimaryKey" parameterType="com.boco.eoms.ruleproject.fujian.gateway.model.CwmRuleGateway" >
+        update cwm_rule_gateway
+        set status = #{status,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>

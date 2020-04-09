@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.simulation.mapper.SimulationDataMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.simulation.model.SimulationData" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="simulation_id" property="simulationId" jdbcType="VARCHAR" />
+        <result column="sheet_id" property="sheetId" jdbcType="TIMESTAMP" />
+        <result column="sheet_title" property="sheetTitle" jdbcType="VARCHAR" />
+        <result column="main_id" property="mainId" jdbcType="VARCHAR" />
+        <result column="execute_result" property="executeResult" jdbcType="VARCHAR" />
+        <result column="execute_duration" property="executeDuration" jdbcType="INTEGER" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      id,simulation_id,sheet_id,sheet_title,main_id,execute_result,execute_duration,create_time
+    </sql>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into cwm_rule_simulation_data   (<include refid="Base_Column_List" />)
+        <foreach  collection="list" item="item"   separator=" union all ">
+            select  #{item.id,jdbcType=VARCHAR}, #{item.simulationId,jdbcType=VARCHAR}, #{item.sheetId,jdbcType=VARCHAR},
+            #{item.sheetTitle,jdbcType=VARCHAR}, #{item.mainId,jdbcType=VARCHAR},
+            #{item.executeResult,jdbcType=VARCHAR},#{item.executeDuration,jdbcType=INTEGER},sysdate
+            from  dual
+        </foreach>
+    </insert>
+
+    <select id="sheetNum" resultType="int" parameterType="java.lang.String">
+        select count(id) from cwm_rule_simulation_data where simulation_id =  #{simulationId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getListBySimulationId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cwm_rule_simulation_data
+        where simulation_id= #{simulationId,jdbcType=VARCHAR}
+    </select>
+
+    <update id="batchUpdate" parameterType="java.util.List">
+        update cwm_rule_simulation_data
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="execute_result =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.executeResult!=null">
+                        when id=#{item.id} then #{item.executeResult}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="execute_duration =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.executeDuration!=null">
+                        when id=#{item.id} then #{item.executeDuration}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id=#{item.id}
+            </foreach>
+        </where>
+    </update>
+
+    <select id="getSimulationDatas" resultMap="BaseResultMap">
+        select id,sheet_id,sheet_title,execute_result
+         from cwm_rule_simulation_data
+        where simulation_id= #{simulationId,jdbcType=VARCHAR}
+        <if test="executeResult !=null and executeResult != ''">
+            and execute_result = #{executeResult,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="getSimulationDataById" resultMap="BaseResultMap" resultType="string">
+        select <include refid="Base_Column_List" /> from cwm_rule_simulation_data
+        where id= #{simulationDataId,jdbcType=VARCHAR}
+    </select>
+</mapper>

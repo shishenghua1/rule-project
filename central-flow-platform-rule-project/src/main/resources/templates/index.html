@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>规则配置页面</title>
+    <link rel="stylesheet" href="../../css/common/bootstrap.min.css"></link> 
+    <link rel="stylesheet" href="../../css/common/bootstrap-table.css"></link>
+    <link rel="stylesheet" href="../../css/common/layui.css"></link>
+
+    <link rel="stylesheet" type="text/css" href="../../css/massage.css"></link>
+
+    <link rel="stylesheet" type="text/css" href="../../css/index.css"></link>
+
+</head>
+<body>
+    <div class="e-g-index">
+    <div class="e-i-fd" onClick="sPage('0')"></div>
+    <div class="e-i-fd fangzhen" onClick="fangzhenShow()"></div>
+    <div id="fangzhenCon">
+        <div id="fangzhenFrame">
+            <div class="header">
+                <span class="getData selected" onClick="tagSelect(this)">获取仿真数据</span>
+                <span class="downLoadTemplate" onClick="tagSelect(this)">下载数据模板</span>
+                <i class="closeBtn" onClick="closePage()"></i>
+            </div>
+            <div class="fangzhenBody tagBodySelected clearfix">
+                <div class="checkedCon">
+                    <p>
+                        <input type="checkbox" id="checked1"/>
+                        <label for="checked1" class="all" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>全部</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked2"/>
+                        <label for="checked2" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>限制回单规则</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked3"/>
+                        <label for="checked3" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>进入人工质检规则网关</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked4"/>
+                        <label for="checked4" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>进入人工复检规则网关</span>
+                    </p>
+                    <p class="lastType" >
+                        <input type="checkbox" id="checked5"/>
+                        <label for="checked5" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>质检后驳回规则网关</span>
+                    </p>
+                </div>
+                <div class="getFangZhenData">
+                    <p class="title">
+                        <img src="../images/huoqushuj.png"/>
+                        <span>获取仿真数据</span>
+                    </p>
+                    <form class="layui-form" action="" id="condition" >
+                       <div class="layui-form-item  layui-input-inline half">
+                            <label class="layui-form-label">网络工单分类</label>
+                            <div class="layui-input-block selectParent borderNone">
+                                <input type="text" onClick="showList(this)" readOnly="readOnly" name="type" lay-verify="required" class="layui-input" id="typeCon"/>
+                                <ul class="typeList list item" onmouseleave="leaveList(this)">
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="layui-form-item  layui-input-inline half">
+                            <label class="layui-form-label">网络工单分二级</label>
+                            <div class="layui-input-block selectParent">
+                                <input type="text" onClick="showList(this)" readOnly="readOnly" name="secondType" lay-verify="required" class="layui-input noSelected" id="secondCon"/>
+                                <ul class="secondList list item" onmouseleave="leaveList(this)">
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="layui-form-item  layui-input-inline half">
+                            <label class="layui-form-label">地市</label>
+                            <div class="layui-input-block selectParent  borderNone">
+                                <input type="text" onClick="showList(this)" readOnly="readOnly" name="city" lay-verify="required" class="layui-input" id="cityCon"/>
+                                <ul class="cityList list item" onmouseleave="leaveList(this)">
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-input-inline half">
+                            <label class="layui-form-label">派单开始时间</label>
+                            <div class="layui-input-block timeCon">
+                                <i class="icon"  id="startTimecIcon"></i>
+                                <input type="field" name="startTime"  readOnly="readOnly"  class="layui-input" id="startTime" lay-verify="required"/>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-input-inline">
+                            <label class="layui-form-label">派单结束时间</label>
+                            <div class="layui-input-block timeCon endTimeCon">
+                                <i class="icon"  id="endTimeIcon"></i>
+                                <input type="field" name="endTime" id="endTime" disabled="disabled" readOnly="readOnly"  class="layui-input noSelectTime"  lay-verify="required"/>
+                            </div>
+                        </div>
+                        <div id="btns">
+                            <button class="cancel" onclick="closePage()">取消</button>
+                            <button class="getDataBtn layui-btn" type="button" lay-submit=""  lay-filter="formSubmit" onClick="getData()" >获取数据</button>
+                            <button class="implement getData" onClick="implement(this)" type="button">仿真执行</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="progressBar">
+                    <span class="tipContent">数据获取中</span>
+                    <!--<div class="progress-out" id="barOuter">
+                        <div class="percent-show"></div>
+                        <div class="progress-in"><span class="rate">0</span></div>
+                    </div>-->
+                    <div id="barOuter">
+                        <div class="barInter"><span class="rate">0</span></div>
+                    </div>
+
+                </div>
+                <p id="tipCon1">
+                    <img src="../images/tongguo.png"/>
+                    <span class="tipContent">数据获取成功</span>
+                </p>
+
+
+            </div>
+            <div class="downLoadTemplateBody clearfix">
+                <div class="checkedCon">
+                    <p>
+                        <input type="checkbox" id="checked1"/>
+                        <label for="checked1" class="all" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>全部</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked2"/>
+                        <label for="checked2" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>限制回单规则</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked3"/>
+                        <label for="checked3" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>进入人工质检规则网关</span>
+                    </p>
+                    <p>
+                        <input type="checkbox" id="checked4"/>
+                        <label for="checked4" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>进入人工复检规则网关</span>
+                    </p>
+                    <p class="lastType" >
+                        <input type="checkbox" id="checked5"/>
+                        <label for="checked5" class="inputChecked" ifCan="true" onClick="selectInput(this)"></label>
+                        <span>质检后驳回规则网关</span>
+                    </p>
+                </div>
+                <div class="downLoadTemplate">
+                    <p class="title">
+                        <a download="javaScript:;" id="downLoadImg" onClick="downLoad()"></a>
+                        <span>下载数据模板（需自行填写数据）</span>
+                    </p>
+                    <form action="##"  target="frameName" id="downLoadForm" class="layui-form" enctype="multipart/form-data" method="post">
+                        <span>上传附件</span>
+                        <input type="text" readonly="readonly" id="fileName" name="fileName"/>
+                        <!--<input type="file" id="chooseFile"  name="file"   style="display:none" onChange="chooseFiles(this)" />
+                        <label for="chooseFile" onClick="chooseFileBtn()">选择附件</label>-->
+
+                        <div style="position:relative;overflow:hidden;height:30px;">
+                            <input type="file" id="chooseFile"  name="file"   style="font-size:28px;height:30px;opacity:0;filter:alpha(opacity=0);width:60px;position:absolute;top:0;right:0;bottom:0;z-index:1" onChange="chooseFiles(this)" />
+                            <label for="chooseFile"  style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:0">选择附件</label>
+                        </div>
+                        <input type="submit" value="Submit" style="display:none" id="downLoadBtn"/>
+                     </form>
+                    <iframe src="" frameborder="0" name="frameName" style="display:none"></iframe>
+                    <p id="tipCon">
+                        <img src="../images/tongguo.png"/>
+                        <span class="tipContent">附件上传成功</span>
+                    </p>
+                </div>
+                <div id="btnsDownLoad">
+                    <button class="cancel" onclick="closePage()">取消</button>
+                    <button class="confirm" onClick="confirm()">确定</button>
+                    <button class="implement downLoad" onClick="implement(this)" >仿真执行</button>
+                </div>
+
+            </div>
+        </div>
+        <div id="implementCon">
+            <div class="header"></div>
+            <div id="fangzhenFlow" class="clearfix">
+                <p>
+                    <img src="../images/bigIcon4.png"/>
+                    <br></br>
+                    <span class="title">限制回单规则网关</span>
+                    <br></br>
+                    <span class="progress">仿真完成</span>
+
+                </p>
+                <p>
+                    <img src="../images/bigIcon4.png"/>
+                    <br></br>
+                    <span class="title">限制回单规则网关</span>
+                    <br></br>
+                    <span class="progress">仿真完成</span>
+
+                </p>
+                <p>
+                    <img src="../images/bigIcon4.png"/>
+                    <br></br>
+                    <span class="title">限制回单规则网关</span>
+                    <br></br>
+                    <span class="progress">仿真完成</span>
+
+                </p>
+                <p class="lastType">
+                    <img src="../images/bigIcon4.png"/>
+                    <br></br>
+                    <span class="title">限制回单规则网关</span>
+                    <br></br>
+                    <span class="progress">仿真完成</span>
+
+                </p>
+            </div>
+            <div id="progressBar1">
+               <!-- <div class="progress-out" id="barOuter1">
+                    <div class="percent-show"></div>
+                    <div class="progress-in"><span class="rate">0</span></div>
+                </div>-->
+                <div id="barOuter1">
+                    <div class="barInter"><span class="rate">0</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <div class="e-left" >
+        <div class="e-wd-50" onClick="sPage('1')">
+            <div class="e-l-lt">
+              <img src="../../images/bigIcon4.png" />
+            </div>
+            <div class="e-l-rt">
+                <p class="e-l-tt">限制回单规则网关</p>
+                <p class="e-l-ct">100％确定性的规则检测，无性能影响，在处理检测中可限制用户提交表单，检测后流转到“质检后驳回网关”.</p>
+                <div class="testswitch" id="onoffswitch" data-id="" data-status="">
+                  
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="e-wd-r"  onClick="sPage('2')">
+          <div class="e-l-lt">
+            <img src="../../images/bigIcon3.png" />
+          </div>
+          <div class="e-l-rt">
+              <p class="e-l-tt">质检后驳回规则网关</p>
+              <p class="e-l-ct">100％确定性的规则检测，且规则有性能影响的可能。规则执行结果为系统直接驳回该张工单，流转到“人工质检网关”.</p>
+              <div class="testswitch" id="onoffswitch1" data-id="" data-status="">
+                
+              </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="e-left" >
+      <div class="e-wd-50"  onClick="sPage('3')">
+         
+          <div class="e-l-rt e-float-r">
+              <p class="e-l-tt">进入人工规则质检网关</p>
+              <p class="e-l-ct">系统无法100％确定判断结果，执行结果可驳回工单，也可以进入人工复检网关，同时也可以选择进入归档环节.</p>
+              <div class="testswitch e-f-left" id="onoffswitch2" data-id="" data-status=""> 
+                
+              </div>
+          </div>
+          <div class="e-l-lt e-f-r">
+            <img src="../../images/bigIcon.png" />
+          </div>
+      </div>
+      
+      <div class="e-wd-r"  onClick="sPage('4')">
+        <div class="e-l-rt e-float-r">
+            <p class="e-l-tt">进入人工复检规则网关</p>
+            <p class="e-l-ct">系统筛选出待人工复检的工单，在归档后进入人工复检。</p>
+            <div class="testswitch e-f-left" id="onoffswitch3" data-id="" data-status="">
+             
+            </div>
+        </div>
+        <div class="e-l-lt e-f-r">
+          <img src="../../images/bigIcon2.png" />
+
+        </div>
+      </div>
+    </div>
+  </div>  
+
+    <script type="text/javascript" src="../../js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../../js/jquery.form.min.js"></script>
+    <script type="text/javascript" src="../../js/jquery-ui.js"></script>
+    <script src="../../js/public/bootstrap.min.js"></script>
+    <script src="../../js/public/bootstrap-table.js"></script>
+    <script src="../../js/public/layui.all.js"></script>
+    <script src="../../js/divscroll.js"></script>
+    <script src="../../js/index.js"></script>
+</body>
+</html>

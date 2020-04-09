@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    #url: jdbc:oracle:thin:@111.204.35.240:9006:helowin
+    url: jdbc:oracle:thin:@10.91.0.101:1521:helowin
+    username: P_EOMS_CENTRAL_WORKFLOW
+    password: P_EOMS_CENTRAL_WORKFLOW
+    # 使用druid数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+
+#日志输出位置
+logging:
+  path: /opt/central-flow-platform/logs/
+
+#规则服务端地址信息
+ruleReloadInfo:
+  ip: 10.91.0.122
+  port: 8095
+  version: v1
+
+#请求接口地址
+interfaceInfo:
+  cityUrl: http://ssh2.wezoz.com/sheet/centralcommonfault/centralReplic.do?method=getAreaData&type=interface&userName=admin
+  simulationDataUrl: http://ssh2.wezoz.com/sheet/centralcommonfault/centralReplic.do?method=getSheetData&type=interface&userName=admin
+  dictUrl: http://ssh2.wezoz.com/sheet/centralcommonfault/centralReplic.do?method=getDictData&type=interface&userName=admin
+
+#接口调用参数值定义
+interfaceParam:
+  parentAreaId: 101
+  parentDictId: 1010104

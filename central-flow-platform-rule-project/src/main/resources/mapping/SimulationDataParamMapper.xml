@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.simulation.mapper.SimulationDataParamMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.simulation.model.SimulationDataParam" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="simulation_data_id" property="simulationDataId" jdbcType="VARCHAR" />
+        <result column="input_param_enname" property="inputParamEnname" jdbcType="VARCHAR" />
+        <result column="input_param_cnname" property="inputParamCnname" jdbcType="VARCHAR" />
+        <result column="inputcwm_rule_simulation_data_param_param_type" property="inputParamType" jdbcType="VARCHAR" />
+        <result column="input_param_value" property="inputParamValue" jdbcType="VARCHAR" />
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      id,simulation_data_id,input_param_enname,Input_param_cnname,input_param_type,input_param_value,create_time
+    </sql>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into cwm_rule_simulation_data_param   (<include refid="Base_Column_List" />)
+        <foreach  collection="list" item="item"   separator=" union all ">
+            select  sys_guid(), #{item.simulationDataId,jdbcType=VARCHAR}, #{item.inputParamEnname,jdbcType=VARCHAR},
+            #{item.inputParamCnname,jdbcType=VARCHAR}, #{item.inputParamType,jdbcType=VARCHAR},#{item.inputParamValue,jdbcType=VARCHAR},
+            sysdate
+            from  dual
+        </foreach>
+    </insert>
+
+    <select id="getListBySimulationDataId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List" /> from cwm_rule_simulation_data_param
+        where simulation_data_id= #{simulationDataId,jdbcType=VARCHAR}
+    </select>
+</mapper>

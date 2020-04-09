@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.boco.eoms.ruleproject.fujian.simulation.mapper.SimulationExecuteMapper">
+
+    <resultMap id="BaseResultMap" type="com.boco.eoms.ruleproject.fujian.simulation.model.SimulationExecute" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="simulation_data_id" property="simulationDataId" jdbcType="VARCHAR" />
+        <result column="gateway_id" property="gatewayId" jdbcType="VARCHAR" />
+        <result column="gateway_name" property="gatewayName" jdbcType="VARCHAR" />
+        <result column="simulation_result" property="simulationResult" jdbcType="VARCHAR" />
+        <result column="simulation_output_param" property="simulationOutputParam" jdbcType="VARCHAR" />
+        <result column="simulation_execute_duration" property="simulationExecuteDuration" jdbcType="INTEGER" />
+        <result column="simulation_execute_time" property="simulationExecuteTime" jdbcType="TIMESTAMP" />
+        <result column="simulation_error" property="simulationError" jdbcType="VARCHAR" />
+        <result column="simulation_score" property="aiSimilarScore" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+      id,simulation_data_id,gateway_id,gateway_name,simulation_result,
+      simulation_output_param,simulation_execute_duration,simulation_execute_time,simulation_error,simulation_score 
+    </sql>
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into  cwm_rule_simulation_execute   (<include refid="Base_Column_List" />)
+        <foreach  collection="list" item="item"   separator=" union all ">
+            select  #{item.id,jdbcType=VARCHAR}, #{item.simulationDataId,jdbcType=VARCHAR}, #{item.gatewayId,jdbcType=VARCHAR},
+            #{item.gatewayName,jdbcType=VARCHAR}, #{item.simulationResult,jdbcType=VARCHAR},#{item.simulationOutputParam,jdbcType=VARCHAR},
+            #{item.simulationExecuteDuration,jdbcType=INTEGER}, sysdate,#{item.simulationError,jdbcType=VARCHAR},#{item.aiSimilarScore,jdbcType=VARCHAR}
+            from  dual
+        </foreach>
+    </insert>
+
+    <select id="getListBySimDataId" resultMap="BaseResultMap" parameterType="string">
+        select <include refid="Base_Column_List" /> from cwm_rule_simulation_execute
+        where simulation_data_id= #{simulationDataId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="simulationSheetNum" resultType="int" parameterType="string">
+        SELECT COUNT(id)
+        FROM cwm_rule_simulation_execute
+        WHERE gateway_id = #{gatewayId,jdbcType=VARCHAR}
+            AND simulation_execute_duration is not null
+            AND simulation_execute_duration != 0
+            AND simulation_data_id IN (
+                SELECT id
+                FROM cwm_rule_simulation_data
+                WHERE simulation_id = #{simulationId,jdbcType=VARCHAR}
+            )
+    </select>
+	<!-- AI相似度数据 -->
+	<select id="getSimulationSimilarData" resultType="java.util.Map" parameterType="string">
+        select count(excute.id) as num,excute.simulation_score as score from cwm_rule_simulation_data data,CWM_RULE_SIMULATION_EXECUTE excute
+		where data.id = excute.simulation_data_id
+		and data.simulation_id = #{simulationId,jdbcType=VARCHAR}  
+		and excute.simulation_score is not null 
+		group by excute.simulation_score
+    </select>
+    <!-- 仿真总任务数 -->
+    	<select id="totalSimulationTask" resultType="int" parameterType="string">
+        select count(*) as taskNum from cwm_rule_simulation_data data where data.simulation_id = #{simulationId,jdbcType=VARCHAR}  
+    </select>
+    <!-- 已完成仿真数 -->
+    <select id="totalComplateSimulationTask" resultType="int" parameterType="string">
+        select count(id) as complateNum from cwm_rule_simulation_data 
+        where simulation_id = #{simulationId,jdbcType=VARCHAR}  
+        and execute_result != 'exception' 
+    </select>
+    <!-- 进入人工复检数 -->
+    <select id="totalSimulationReCheckTask" resultType="int" parameterType="string">
+        select count(data.id) as fjnum from cwm_rule_simulation_data data,CWM_RULE_SIMULATION_EXECUTE excute
+		where data.id = excute.simulation_data_id
+		and data.simulation_id = #{simulationId,jdbcType=VARCHAR} 
+		and excute.gateway_id = #{gatewayId,jdbcType=VARCHAR} 
+		and excute.simulation_result = 'true' 
+    </select>
+    <!-- 仿真执行总时长 -->
+    <select id="totalSimulationExcuteTime" resultType="java.lang.Long" parameterType="string">
+        select sum(simulation_execute_duration) as totalTime from cwm_rule_simulation_data data,CWM_RULE_SIMULATION_EXECUTE excute
+		where data.id = excute.simulation_data_id
+		and data.simulation_id = #{simulationId,jdbcType=VARCHAR} 
+    </select>
+    <!-- 非人工复检总任务数 -->
+    <select id="totalSimulationNotReCheckTask" resultType="int" parameterType="string">
+		select count(data.id) as checkingTask from cwm_rule_simulation_data data,CWM_RULE_SIMULATION_EXECUTE excute
+		where data.id = excute.simulation_data_id
+		and data.simulation_id = #{simulationId,jdbcType=VARCHAR} 
+		and excute.gateway_id != #{gatewayId,jdbcType=VARCHAR} 
+    </select>
+    <!-- 非人工复检通过任务数 -->
+    <select id="totalSimulationNotReCheckTaskPass" resultType="int" parameterType="string">
+		select count(data.id) as checkingTask from cwm_rule_simulation_data data,CWM_RULE_SIMULATION_EXECUTE excute
+		where data.id = excute.simulation_data_id
+		and data.simulation_id = #{simulationId,jdbcType=VARCHAR} 
+		and excute.gateway_id != #{gatewayId,jdbcType=VARCHAR} 
+		and excute.simulation_result = 'true' 
+    </select>
+    <!--仿真执行批量插入-->
+    <update id="batchUpdate" parameterType="java.util.List">
+        update cwm_rule_simulation_execute
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="simulation_execute_duration =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.simulationExecuteDuration!=null">
+                        when id=#{item.id} then #{item.simulationExecuteDuration}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="simulation_output_param =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.simulationOutputParam!=null">
+                        when id=#{item.id} then #{item.simulationOutputParam}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="simulation_error =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.simulationError!=null">
+                        when id=#{item.id} then #{item.simulationError}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="simulation_score =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.aiSimilarScore!=null">
+                        when id=#{item.id} then #{item.aiSimilarScore}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="simulation_result =case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.simulationResult!=null">
+                        when id=#{item.id} then #{item.simulationResult}
+                    </if>
+                </foreach>
+            </trim>
+        </trim>
+        <where>
+            <foreach collection="list" separator="or" item="item">
+                id=#{item.id}
+            </foreach>
+        </where>
+    </update>
+</mapper>
